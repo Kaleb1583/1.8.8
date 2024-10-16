@@ -1,6 +1,6 @@
 Arrows that blow up (spawns tnt) on contact with the ground, a mob or player.  
 
-TntArrow.java: EntityArrow.java but with tnt on hit.  
+TntArrow.java: EntityArrow.java but with tnt on hit.  (replace entityarrow's code with this to use)
 EntityArrow.java: Default class for arrows without tnt.  
 
 Configuration: Line 55 & 56 (tntSpawned boolean & tntCount int)  
