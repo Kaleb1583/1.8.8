@@ -4,6 +4,8 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -51,11 +53,23 @@ public class EntityArrow extends Entity implements IProjectile
     private int knockbackStrength;
     
     private boolean tntSpawned = false;
+    private int tntCount = 1;
     
     public void spawnTNT(World world, double x, double y, double z) {
-        EntityTNTPrimed tnt = new EntityTNTPrimed(world, x, y, z, (EntityLivingBase) null);
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayerSP p = mc.thePlayer;
+        World currentWorld = Minecraft.getMinecraft().theWorld;
+    	double minOffset = 0.1;
+    	double maxOffset = 2.9;
+    	// this will try to spread it out so its not all just in one spot.
+    	double xO = minOffset + (maxOffset * Math.random());
+        double yO = minOffset + (maxOffset * Math.random());
+        double zO = minOffset + (maxOffset * Math.random());
+        
+        EntityTNTPrimed tnt = new EntityTNTPrimed(world, x+xO, y+yO/2, z+xO, (EntityLivingBase) null); // (having the y offset up to the max doesnt blow up right imo so i split it)
         tnt.fuse = 0;
         world.spawnEntityInWorld(tnt);
+        this.isDead = true; // kills/remove arrow
     }
     
     public EntityArrow(World worldIn)
@@ -350,11 +364,21 @@ public class EntityArrow extends Entity implements IProjectile
                             {
                                 EnchantmentHelper.applyThornEnchantments(entitylivingbase, this.shootingEntity);
                                 EnchantmentHelper.applyArthropodEnchantments((EntityLivingBase)this.shootingEntity, entitylivingbase);
+                                
+                                System.out.println("entitylivingbase");
+                                
+                                if(!tntSpawned == true) {
+                                	for(int i = 0; i < tntCount; i++) {
+                                		spawnTNT(worldObj, entitylivingbase.posX, entitylivingbase.posY, entitylivingbase.posZ);
+                                	}
+                                	tntSpawned = true;
+                                }
                             }
 
                             if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity && movingobjectposition.entityHit instanceof EntityPlayer && this.shootingEntity instanceof EntityPlayerMP)
                             {
                                 ((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(6, 0.0F));
+                                                             
                             }
                         }
 
@@ -394,12 +418,11 @@ public class EntityArrow extends Entity implements IProjectile
                     this.posZ -= this.motionZ / (double)f5 * 0.05000000074505806D;
                     this.playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
                     this.inGround = true;
-                    
-                    int tntCount = 1;
-                    
+                                        
                     if(!tntSpawned == true) {
                     	for(int i = 0; i < tntCount; i++) {
                     		spawnTNT(worldObj, xTile, yTile, zTile);
+                    		//System.out.println("spawned tnt at (" + xTile + ", " + yTile + ", " + zTile + ")");
                     	}
                     	tntSpawned = true;
                     }
