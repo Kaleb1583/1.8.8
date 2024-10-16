@@ -7,6 +7,7 @@ Configuration: Line 55 & 56 (tntSpawned boolean & tntCount int)
 
 line number is at where spawnTNT is at (if -> for -> spawnTNT)  
 (line numbers below are off by a few, need to fix but dont got time currently)  
+  
 Arrow Hits Mob/Animal/Player: Line 359  
 Arrow Hits Another Player: Line 373 (i removed the code here since the one above handles player hits too)  
 Arrow Hits Ground: Line 411  
